@@ -15,9 +15,7 @@ from django.conf import settings
 settings.configure(
     SECRET_KEY="demo",
     DEBUG=False,
-    DATABASES={
-        "default": {"ENGINE": "django.db.backends.sqlite3", "NAME": ":memory:"}
-    },
+    DATABASES={"default": {"ENGINE": "django.db.backends.sqlite3", "NAME": ":memory:"}},
     INSTALLED_APPS=["django.contrib.contenttypes", "django.contrib.auth", "__main__"],
     USE_TZ=True,
     DEFAULT_AUTO_FIELD="django.db.models.BigAutoField",

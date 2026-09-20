@@ -17,8 +17,8 @@ Local, com 20 registros de teste, a página abre instantaneamente. Em produção
 com 20 mil, ela trava — e o código parece perfeitamente inocente:
 
 ```python
-for author in Author.objects.all():          # 1 consulta
-    print(author.publisher.name)             # + 1 consulta por autor
+for author in Author.objects.all():  # 1 consulta
+    print(author.publisher.name)  # + 1 consulta por autor
 ```
 
 Você não vê o problema no código; vê no log de consultas. E ninguém lê o log de
@@ -74,13 +74,13 @@ pip install git+https://github.com/Rafaelcarvalho320/django-nplus1-guard.git
 ```python
 # settings.py
 MIDDLEWARE = [
-    "nplus1_guard.middleware.NPlusOneMiddleware",   # o mais alto possível
-    ...
+    "nplus1_guard.middleware.NPlusOneMiddleware",  # o mais alto possível
+    ...,
 ]
 
 NPLUS1_GUARD = {
-    "THRESHOLD": 5,       # mais de 5 consultas da mesma forma é suspeito
-    "RAISE": DEBUG,       # estoura local, só registra em log fora dali
+    "THRESHOLD": 5,  # mais de 5 consultas da mesma forma é suspeito
+    "RAISE": DEBUG,  # estoura local, só registra em log fora dali
 }
 ```
 

@@ -50,6 +50,10 @@ packages = ["src/nplus1_guard"]
 DJANGO_SETTINGS_MODULE = "tests.settings"
 testpaths = ["tests"]
 addopts = "-q --strict-markers -p no:randomly"
+# The suite imports `tests.settings` and `tests.testapp`, which needs the repo
+# root importable. `python -m pytest` adds the working directory for free and a
+# bare `pytest` does not, so CI would fail where local runs passed.
+pythonpath = ["."]
 
 [tool.ruff]
 line-length = 88
