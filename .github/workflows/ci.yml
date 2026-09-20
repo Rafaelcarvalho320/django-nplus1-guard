@@ -1,0 +1,90 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - python-version: "3.10"
+            django: "4.2"
+          - python-version: "3.11"
+            django: "5.0"
+          - python-version: "3.12"
+            django: "5.1"
+          - python-version: "3.12"
+            django: "5.2"
+          - python-version: "3.13"
+            django: "5.2"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+          cache-dependency-path: pyproject.toml
+
+      - name: Install
+        run: |
+          pip install -e ".[dev]"
+          pip install "Django~=${{ matrix.django }}.0"
+
+      - name: Confirm the Django version under test
+        run: python -c "import django; print(django.get_version())"
+
+      - name: Lint
+        run: ruff check .
+
+      - name: Format check
+        run: ruff format --check .
+
+      - name: Test
+        run: pytest -q
+
+  types:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+      - run: pip install -e ".[dev]"
+      - run: mypy
+
+  demo:
+    # The README quotes this script's output, so it has to keep running.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e .
+      - name: The demo runs and the fix really removes the queries
+        run: |
+          output=$(python examples/demo.py)
+          echo "$output"
+          echo "$output" | grep -q "41 queries down to 2"
+
+  dogfood:
+    # The plugin has to survive being pointed at its own suite.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e ".[dev]"
+      - name: Report mode never fails a run
+        run: pytest -q --nplus1-report
